@@ -7,16 +7,18 @@ import urllib.parse
 from PIL import Image
 from logger import Logger
 from lxml import html
+from imgurpython import ImgurClient
+from typing import Optional
 
 
 class IconManager:
-    def __init__(self, imgur, data, user_agent):
+    def __init__(self, imgur: ImgurClient, data: dict, user_agent: str):
         self._imgur_client = imgur
         self._hashes = data
         self._user_agent = user_agent
         self._logger = Logger.get_logger()
 
-    def get(self, url):
+    def get(self, url: str) -> Optional[str]:
         """
         Gets and caches the requested icon.
         :param url: The url of the icon.
@@ -38,7 +40,7 @@ class IconManager:
 
         return ico
 
-    def save(self, target):
+    def save(self, target: str):
         """
         Saves the cache to a disk file.
         :param target: The target file.
@@ -46,7 +48,7 @@ class IconManager:
         with open(target, 'w+') as out:
             json.dump(self._hashes, out)
 
-    def _cache_icon(self, ico_hash, content):
+    def _cache_icon(self, ico_hash: str, content: bytes) -> Optional[str]:
         """
         Caches the icon and uploads it to our cache host.
         :param ico_hash: The icon hash from the original .ico file.
@@ -67,7 +69,7 @@ class IconManager:
         return None
 
     @staticmethod
-    def _get_favicon_path(url, response):
+    def _get_favicon_path(url: str, response: requests.Response) -> Optional[str]:
         """
         Gets the custom favicon path, if available.
         :param response: The base url of the request.
@@ -89,7 +91,7 @@ class IconManager:
         return urllib.parse.urljoin(url, href)
 
     @staticmethod
-    def _get_temp_file_name():
+    def _get_temp_file_name() -> str:
         """
         Gets a temporary file name.
         :return: The temporary file name on the disk.

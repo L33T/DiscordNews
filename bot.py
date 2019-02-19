@@ -5,10 +5,11 @@ import json
 from discord import Client
 from news.code_project import CodeProject
 from logger import Logger
+from icon_manager import IconManager
 
 
 class Bot(Client):
-    def __init__(self, token, config, icon_manager, loop=None, **kwargs):
+    def __init__(self, token: str, config, icon_manager: IconManager, loop=None, **kwargs):
         super().__init__(loop=loop, **kwargs)
 
         self._token = token
@@ -29,7 +30,7 @@ class Bot(Client):
         """
         super().run(self._token, *args, **kwargs)
 
-    def save(self, target):
+    def save(self, target: str):
         """
         Saves the config to a disk file.
         :param target: The target file.
@@ -57,7 +58,6 @@ class Bot(Client):
         while self._pull_news:
             today_timestamp = time.mktime(
                 datetime.datetime.strptime(datetime.datetime.today().strftime('%d %b %Y'), "%d %b %Y").timetuple())
-            today_timestamp -= 86400000
             self._logger.info("Probing news", today_timestamp=today_timestamp)
             if today_timestamp <= self._last_post_timestamp:
                 self._logger.info("Already posted news today, aborting probe.")
@@ -74,6 +74,7 @@ class Bot(Client):
                     self._last_post_timestamp = today_timestamp
                 for item in items:
                     self._logger.debug("Posting item", name=item.title)
+                    # TODO: Match color to category.
                     embed = item.to_embed(0xFF80C0, self._icon_manager, f'{feed} - {item.date}')
                     if embed:
                         for channel in self._channels:

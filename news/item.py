@@ -4,7 +4,7 @@ from icon_manager import IconManager
 
 
 class NewsItem:
-    def __init__(self, title, subtitle, url, source, item_type, date):
+    def __init__(self, title: str, subtitle: str, url: str, source: str, item_type: str, date: str):
         self.title = title
         self.subtitle = subtitle
         self.url = url
@@ -12,7 +12,7 @@ class NewsItem:
         self.item_type = item_type
         self.date = date
 
-    def to_embed(self, color: int, icon_mgr: IconManager = None, footer: str = None):
+    def to_embed(self, color: int, icon_mgr: IconManager = None, footer: str = None) -> Embed:
         """
         Converts the news item into a discord embed.
         :param color: The color of the embed line.
