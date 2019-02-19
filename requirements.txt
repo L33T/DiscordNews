@@ -1,0 +1,7 @@
+structlog
+Pillow
+imgurpython
+lxml
+requests
+PyYAML
+discord
