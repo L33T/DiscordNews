@@ -18,7 +18,7 @@ class IconManager:
         self._user_agent = user_agent
         self._logger = Logger.get_logger()
 
-    def get(self, url: str) -> Optional[str]:
+    def get(self, url: str) -> str:
         """
         Gets and caches the requested icon.
         :param url: The url of the icon.
@@ -28,17 +28,18 @@ class IconManager:
         self._logger.debug('IconManager favicon url', url=url)
 
         response = requests.get(url, {'User-Agent': self._user_agent})
-        if response.status_code != 200:
-            return None
+        if response.status_code == 200:
+            ico_hash = hashlib.sha256(response.content).hexdigest()
+            self._logger.debug("IconManager favicon hash", icon_hash=ico_hash)
 
-        ico_hash = hashlib.sha256(response.content).hexdigest()
-        self._logger.debug("IconManager favicon hash", icon_hash=ico_hash)
+            ico = self._hashes.get(ico_hash, None)
+            if not ico and self._imgur_client:
+                ico = self._cache_icon(ico_hash, response.content)
 
-        ico = self._hashes.get(ico_hash, None)
-        if not ico:
-            ico = self._cache_icon(ico_hash, response.content)
+            if ico:
+                url = ico
 
-        return ico
+        return url
 
     def save(self, target: str):
         """
@@ -80,11 +81,11 @@ class IconManager:
             return None
 
         nodes = html.fromstring(response.content)
-        icon = nodes.xpath('//link[@rel="shortcut icon"]')
-        if not icon:
+        icon = nodes.xpath('//link[contains(@rel, "icon") and contains(@href, "favicon")]')
+        if len(icon) == 0:
             return None
 
-        href = icon[0].get('href')
+        href = icon[-1].get('href')
         if href.startswith("http"):
             return href
 

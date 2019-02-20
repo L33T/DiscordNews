@@ -14,10 +14,10 @@ def get_args():
     :return: The parsed arguments.
     """
     args = argparse.ArgumentParser(prog="NewsBot")
-    args.add_argument('--token', help='The bot token to be used to authenticate against discord')
+    args.add_argument('--token', help='The bot token to be used to authenticate against discord', required=True)
     args.add_argument('--imgur', help='The imgur client id to be used for uploading the .ico')
-    args.add_argument('--config', help='The config file that contains most of the settings')
-    args.add_argument('--icons', help='The icons cache file')
+    args.add_argument('--config', help='The config file that contains most of the settings', required=True)
+    args.add_argument('--icons', help='The icons cache file', required=True)
     args.add_argument('--debug', help='Sets the logger to output debug into console',
                       required=False, action='store_true')
     return args.parse_args()
@@ -58,6 +58,8 @@ def main():
         return 1
 
     Logger.IS_DEBUG = args.debug
+    if not config["servers"]:
+        Logger.get_logger().warn("Bot started without any servers.")
 
     try:
         imgur_client = imgurpython.ImgurClient(args.imgur, None)
