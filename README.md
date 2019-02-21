@@ -6,7 +6,7 @@ Current supported news sources:
 
 ## Quick setup
 First install the project requirements
-```plaintext
+```shell
 $ python -m pip install -r requirements.txt
 ```
 Afterwards, configure the file in `config/config.yaml` to your taste

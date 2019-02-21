@@ -8,36 +8,36 @@ from typing import List, Optional
 
 
 class CodeProject(NewsFeed):
-    def get(self, ua: str, timestamp: float, raw: bytes = None, url: bytes = None, *args, **kwargs) \
+    def get(self, ua: str, min_date: datetime.date, raw: bytes = None, url: bytes = None, *args, **kwargs) \
             -> Optional[List[NewsItem]]:
         """
         Gets the news items from the feed.
         :param ua: The user agent to be used in the request.
-        :param timestamp: The timestamp for the oldest item acceptable.
+        :param min_date: The minimum date accepted.
         :param raw: A raw bytes string to parse.
         :param url: The URL to retrieve the HTML content from.
         :return: A list of news items.
         """
         if raw:
-            return self._pick(self._parse(raw), timestamp)
+            return self._pick(self._parse(raw), min_date)
 
         url = url or 'https://www.codeproject.com/script/News/List.aspx'
-        result = requests.get(url, {'User-Agent': ua})
+        result = requests.get(url, headers={'User-Agent': ua})
         if result and result.status_code == 200:
-            return self._pick(self._parse(result.content), timestamp)
+            return self._pick(self._parse(result.content), min_date)
 
     @staticmethod
-    def _pick(items: List[NewsItem], timestamp: float) -> List[NewsItem]:
+    def _pick(items: List[NewsItem], min_date: datetime.date) -> List[NewsItem]:
         """
         Picks the wanted news items according to the oldest timestamp acceptable.
         :param items: The collected news items.
-        :param timestamp: The oldest timestamp acceptable.
+        :param min_date: The minimum date accepted.
         :return: The picked list of news items.
         """
         picked_items = []
         for item in items:
-            item_timestamp = time.mktime(datetime.datetime.strptime(item.date, "%d %b %Y").timetuple())
-            if item_timestamp >= timestamp:
+            item_date = datetime.datetime.strptime(item.date, "%d %b %Y").date()
+            if item_date >= min_date:
                 picked_items.append(item)
         return picked_items
 

@@ -20,14 +20,27 @@ class IconManager:
 
     def get(self, url: str) -> str:
         """
+        Gets and caches the requested icon safely.
+        :param url: The url of the icon.
+        :return: The cached icon url.
+        """
+        self._logger.debug("IconManager request", url=url)
+        try:
+            return self._get(url)
+        except Exception as e:
+            self._logger.info("IconManager failed to get icon, defaulting..", e=e)
+            return url
+
+    def _get(self, url: str) -> str:
+        """
         Gets and caches the requested icon.
         :param url: The url of the icon.
         :return: The cached icon url.
         """
-        url = self._get_favicon_path(url, requests.get(url, {'User-Agent': self._user_agent})) or f'{url}/favicon.ico'
+        url = self._get_favicon_path(url, requests.get(url, headers={'User-Agent': self._user_agent})) or f'{url}/favicon.ico'
         self._logger.debug('IconManager favicon url', url=url)
 
-        response = requests.get(url, {'User-Agent': self._user_agent})
+        response = requests.get(url, headers={'User-Agent': self._user_agent})
         if response.status_code == 200:
             ico_hash = hashlib.sha256(response.content).hexdigest()
             self._logger.debug("IconManager favicon hash", icon_hash=ico_hash)
@@ -38,6 +51,7 @@ class IconManager:
 
             if ico:
                 url = ico
+                self._logger.debug("IconManager cached url", url=url)
 
         return url
 
