@@ -1,1 +1,15 @@
-{"servers": [""], "channel": "programming-news", "probe_news_delay": 3600.0, "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.109 Safari/537.36", "cache": {"timestamp": 0.0, "items": []}}
+user_agent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.109 Safari/537.36'
+probe_news_delay: 3600.0
+servers:
+    'server_id_here':
+        channel: programming-news
+        reactions:
+            - '💯'
+            - '🙂'
+            - '😢'
+            - '🤔'
+            - '👀'
+cache:
+    timestamp: 0.0
+    items:
+        -

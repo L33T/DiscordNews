@@ -2,7 +2,7 @@ import requests
 import hashlib
 import tempfile
 import io
-import json
+import yaml
 import urllib.parse
 from PIL import Image
 from logger import Logger
@@ -61,7 +61,7 @@ class IconManager:
         :param target: The target file.
         """
         with open(target, 'w+') as out:
-            json.dump(self._hashes, out)
+            yaml.dump(self._hashes, out)
 
     def _cache_icon(self, ico_hash: str, content: bytes) -> Optional[str]:
         """

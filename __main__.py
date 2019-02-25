@@ -6,7 +6,7 @@ import asyncio
 import datetime
 import time
 import random
-import json
+import re
 from bot import Bot as DiscordBot
 from icon_manager import IconManager
 from logger import Logger
@@ -15,6 +15,7 @@ from imgurpython.helpers.error import ImgurClientError
 from typing import Optional
 from yaml.parser import ParserError
 from news.feeds import CodeProject
+from yaml.reader import Reader
 
 
 class NewsBot:
@@ -59,7 +60,7 @@ class NewsBot:
         """
         self._icon_manager.save(self._args.icons)
         with open(self._args.config, 'w+') as config_file:
-            json.dump(self._config, config_file)
+            yaml.dump(self._config, config_file)
 
     async def collect_news(self):
         """
@@ -138,8 +139,12 @@ class NewsBot:
         :param file_path: The file path of the YAML file.
         :return: The parsed YAML data, or None if the loading fails.
         """
+        # Avoid a bug with special characters in PyYAML.
+        yaml.reader.Reader.NON_PRINTABLE = re.compile(
+            u'[^\x09\x0A\x0D\x20-\x7E\x85\xA0-\uD7FF\uE000-\uFFFD\U00010000-\U0010FFFF]')
+
         try:
-            with open(file_path, 'r') as config_file:
+            with open(file_path, 'r', encoding='utf-8') as config_file:
                 return yaml.load(config_file.read())
         except ParserError:
             return None

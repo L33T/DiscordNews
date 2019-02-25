@@ -11,8 +11,7 @@ $ python -m pip install -r requirements.txt
 ```
 Afterwards, configure the file in `config/config.yaml` to your taste
 ```plaintext
-servers: The list of servers the bot should post in
-channel: The target channel where the news should be posted in
+servers: The list of servers the bot should post in, and the configuration (channel/reactions)
 probe_news_delay: How much time(in seconds) to wait between checks
 user_agent: The user agent to used when visting URLs
 last_post_timestamp: The last post timestamp
