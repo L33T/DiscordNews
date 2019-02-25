@@ -1,5 +1,4 @@
 import requests
-import time
 import datetime
 from lxml import html
 from news.item import NewsItem

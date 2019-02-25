@@ -32,6 +32,27 @@ class Bot(Client):
         self._batches.append(batch)
         await self.start(self._token, *args, **kwargs)
 
+    async def logout(self):
+        """
+        Logs out of Discord and closes all connections.
+        """
+        await self.close()
+        self._is_logged_in.clear()
+
+    async def close(self):
+        """
+        Closes the connection to discord.
+        """
+        if self.is_closed:
+            return
+
+        if self.ws is not None and self.ws.open:
+            self.ws.close()
+
+        await self.http.close()
+        self._closed.set()
+        self._is_ready.clear()
+
     async def on_ready(self):
         """
         Ready event, fires once the bot is connected to the discord servers.
@@ -92,7 +113,7 @@ class Bot(Client):
         else:
             emoji = reaction
 
-        reaction_printable = codecs.encode(bytes(reaction), 'hex') if len(reaction) == 1 else reaction
+        reaction_printable = codecs.encode(bytes(reaction, 'utf-8'), 'hex') if len(reaction) == 1 else reaction
         if not emoji:
             self._logger.error("Emoji not found", message=message.id, reaction=reaction_printable)
             return
