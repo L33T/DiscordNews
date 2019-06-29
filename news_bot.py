@@ -86,9 +86,12 @@ class NewsBot:
         :param items: The items to process which were pulled from the feed.
         """
         item_cache = self._config['cache']['items']
+
+        self._logger.debug("Creating batch", feed=feed, item_count=len(items))
         batch_color = random.Random(datetime.datetime.today().date().__hash__()).randint(0x0, 0xFFFFFF)
         batch = []
         for item in [x for x in items if x.url not in item_cache]:
+            self._logger.debug("Adding to batch", batch_len=len(batch), item=item)
             batch.append(item.to_embed(batch_color, self._icon_manager, f'{feed} @ {item.date}'))
             item_cache.append(item.url)
 

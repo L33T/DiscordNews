@@ -6,4 +6,4 @@ imgurpython
 lxml
 requests
 PyYAML
-discord
+discord.py>=1.2.3

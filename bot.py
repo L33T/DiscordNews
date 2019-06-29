@@ -3,6 +3,7 @@ import codecs
 from typing import List
 from collections import namedtuple
 from discord import Client, Embed, HTTPException, Forbidden, NotFound, InvalidArgument, Message, Emoji
+from discord.abc import Messageable
 from logger import Logger
 
 
@@ -32,27 +33,6 @@ class Bot(Client):
         self._batches.append(batch)
         await self.start(self._token, *args, **kwargs)
 
-    async def logout(self):
-        """
-        Logs out of Discord and closes all connections.
-        """
-        await self.close()
-        self._is_logged_in.clear()
-
-    async def close(self):
-        """
-        Closes the connection to discord.
-        """
-        if self.is_closed:
-            return
-
-        if self.ws is not None and self.ws.open:
-            self.ws.close()
-
-        await self.http.close()
-        self._closed.set()
-        self._is_ready.clear()
-
     async def on_ready(self):
         """
         Ready event, fires once the bot is connected to the discord servers.
@@ -60,7 +40,7 @@ class Bot(Client):
         self._logger.info("Connected to discord servers.")
 
         servers = self._config["servers"]
-        for server in [s for s in self.servers if str(s.id) in servers]:
+        for server in [s for s in self.guilds if str(s.id) in servers]:
             server_info = servers[str(server.id)]
             channel = next(iter([c for c in server.channels if c.name == server_info["channel"]]), None)
             if not channel:
@@ -84,7 +64,8 @@ class Bot(Client):
                     for item in batch:
                         self._logger.info("Posting item", title=item.title,
                                           server=route.server.name, channel=route.channel.name)
-                        msg = await self.send_message(route.channel, embed=item)
+                        channel: Messageable = route.channel
+                        msg = await channel.send(embed=item)
 
                         for reaction in route.reactions:
                             await self._add_reaction(msg, route.server.emojis, reaction)
@@ -119,7 +100,7 @@ class Bot(Client):
             return
 
         try:
-            await self.add_reaction(message, emoji)
+            await message.add_reaction(emoji)
         except Forbidden:
             self._logger.error("Improper permissions, unable to add reaction", message=message.id,
                                reaction=reaction_printable)
